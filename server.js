@@ -17,15 +17,16 @@ const register = require('./Controllers/register');
 const profile = require('./Controllers/profile');
 const image = require('./Controllers/image');
 
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0; 
 
 const db = knex({
     client: 'pg',
     connection: {
-      host : '127.0.0.1',
-      port : 5432,
-      user : 'postgres',
-      password : 'raghava1',
-      database : 'Smart-Brain'
+      connectionString : 'process.env.DATABASE_URL',  //postgresql-cylindrical-39400
+    //   port : 5432,
+    //   user : 'postgres',
+    //   password : 'raghava1',
+    //   database : 'Smart-Brain'
     }
 });
 
@@ -34,9 +35,8 @@ const db = knex({
 // });
 
 // need to state this to be able parse the request data.
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
-var salt = bcrypt.genSaltSync(10);
 // what we need------------
 //  / -> GET: a root node to check if the api is working
 //  /signin -> POST: validate the username and password... return success/fail
@@ -63,10 +63,6 @@ app.get('/', (req, res) => {
     res.json('this is a connection test');
 })
 
-// Return the list of existing users  their details
-app.get('/users', (req, res) => {
-    res.json(database.users);
-})
 
 // user authentication
 app.post('/signin', (req, res)  => {signin.handleSignin(req, res, db, bcrypt)});
@@ -81,6 +77,6 @@ app.put('/image', (req, res) => {image.handleImage(req, res, db)});
 app.post('/imageurl', (req, res) => {image.handleImageUrl(req, res)});
 
 
-app.listen(3000, () => {
-    console.log('API Server is running on port 3000');
+app.listen(process.env.PORT || 3000, () => {
+    console.log(`API Server is running on port ${process.env.PORT}`);
 })
